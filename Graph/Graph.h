@@ -2,6 +2,7 @@
 #include <vector>
 #include<string>
 #include<iostream>
+#include <stdarg.h>
 using namespace std;
 struct Edge
 {
@@ -40,7 +41,7 @@ public:
 	int E() { return _e; }
 	void addEdge(int v, int w,int weight);//添加一条变v-w
 	const Vertex &adj(int v);//顶点v的邻居节点
-	friend ostream &operator <<(ostream&out, Graph G);
+	friend ostream &operator <<(ostream&out, Graph &G);
 	~Graph();
 	void removeVertex(int v);
 	void removeEdge(int v, int w);
@@ -49,6 +50,9 @@ private:
 	int _e;
 	Vertex *_vtables;
 	void removeEdgeFromVtables(int v, int w);
+	Graph(const Graph&);
+	const Graph &operator =(const Graph &);
 	
 };
-ostream &operator <<(ostream&out, Graph G);
+ostream &operator <<(ostream&out, Graph &G);
+int log(const char* fmt, ...);

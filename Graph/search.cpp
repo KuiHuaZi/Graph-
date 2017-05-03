@@ -22,6 +22,7 @@ void DephthFristSearch::dfs(const Graph &G, int v)
 		{
 			dfs(G, e->_v);
 		}
+		e = e->_next;
 	}
 
 }

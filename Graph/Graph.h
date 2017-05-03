@@ -21,6 +21,7 @@ struct Edge
 		_weight = -1;
 		_next = nullptr;
 	}
+
 };
 struct Vertex
 {
@@ -40,7 +41,7 @@ public:
 	int V() { return _v; }
 	int E() { return _e; }
 	void addEdge(int v, int w,int weight);//添加一条变v-w
-	const Vertex &adj(int v);//顶点v的邻居节点
+	const Vertex &adj(int v)const;//顶点v的邻居节点
 	friend ostream &operator <<(ostream&out, Graph &G);
 	~Graph();
 	void removeVertex(int v);

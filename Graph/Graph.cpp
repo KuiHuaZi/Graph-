@@ -105,7 +105,7 @@ void Graph::addEdge(int v, int w,int weight)//到底有没有哨兵节点？没有
 	_e++;
 	log("[addEdge]end!\n");
 }
-const Vertex& Graph::adj(int v)//返回表示顶点v的结构体的引用，结构体中adj指针指向邻接表的第一条边，若指向null表示没有边
+const Vertex& Graph::adj(int v)const//返回表示顶点v的结构体的引用，结构体中adj指针指向邻接表的第一条边，若指向null表示没有边
 {
 	if (v >= _v)
 	{

@@ -4,34 +4,70 @@
 #include<iostream>
 #include <stdarg.h>
 using namespace std;
-struct Edge
+class Vertex;
+class Edge
 {
-	int _weight;
-	int _v;//边指向的另外一个节点
-	Edge *_next;//下一条边
-	Edge(int v, int weight, Edge*next)
+	friend class Vertex;
+	friend ostream &operator<<(ostream&out, const Edge &E);
+	//friend class Graph;
+public:
+	Edge(int src,int dest, int weight, Edge*next)
 	{
-		_v = v;
+		_src = src;
+		_dest = dest;
 		_weight = weight;
 		_next = next;
 	}
 	Edge()//默认构造尾链点
 	{
-		_v = -1;
+		_src = -1;
+		_dest = -1;
 		_weight = -1;
 		_next = nullptr;
 	}
+	Edge& operator =(const Edge&e)
+	{
+
+		_src = e._src;
+		_dest = e._dest;
+		_weight = e._weight;
+		_next = e._next;
+		return *this;
+	}
+	int getDest() const{ return _dest; }
+	int getSrc() const{ return _src; }
+	int getWeight() const{ return _weight; }
+	Edge *getNext() const { return _next; }
+	int lessThan(const Edge &that)const
+	{
+		if (_weight < that._weight)return 1;
+		else if (_weight > that._weight)return -1;
+		else return 0;
+	}
+	int _weight;
+	int _dest;//边指向的另外一个节点
+	Edge *_next;//下一条边
+	int _src;
+private:
 
 };
-struct Vertex
+class Vertex
 {
-	int degree;
-	Edge * adj;
-	Vertex()
-	{
-		degree = 0;
-		adj = nullptr;
-	}
+	//friend class Graph;
+	friend ostream &operator <<(ostream&out, const Vertex &V);
+public:
+	int _v;
+	Vertex();
+	void addEdge(int src, int dest, int weight);
+	bool removeEdge(int dest);
+	~Vertex();
+	int _degree;
+	Edge * _adj;
+private:
+	Vertex(const Vertex&);
+	Vertex &operator = (const Vertex&);
+
+	
 };
 class Graph
 {
@@ -46,14 +82,16 @@ public:
 	~Graph();
 	void removeVertex(int v);
 	void removeEdge(int v, int w);
+	int numberOfSelfloops();
 private:
 	int _v;
 	int _e;
 	Vertex *_vtables;
-	void removeEdgeFromVtables(int v, int w);
 	Graph(const Graph&);
 	const Graph &operator =(const Graph &);
 	
 };
-ostream &operator <<(ostream&out, Graph &G);
+ostream &operator <<(ostream&out, const Graph &G);
+ostream &operator <<(ostream&out, const Vertex &V);
+ostream &operator<<(ostream&out, const Edge &E);
 int log(const char* fmt, ...);

@@ -1,70 +1,147 @@
 #include "Graph.h"
-int degree(Graph& G, int v)
+//int degree(Graph& G, int v)
+//{
+//	int degree = 0;
+//	degree = G.adj(v).degree;
+//	return degree;
+//}
+//int maxDegree(Graph &G)
+//{
+//	int max = 0;
+//	for (int v = 0; v < G.V(); v++)
+//	{
+//		if (degree(G, v) > max)max = degree(G, v);
+//
+//	}
+//	return max;
+//}
+//double avgDegree(Graph &G)
+//{
+//	return 2 * G.E() / G.V();
+//}
+//int numberOfSelfloops()
+//{
+//	int count = 0;
+//	for(int v = 0; v < G.V(); v++)
+//	{
+//		const Vertex &vertex = G.adj(v);
+//		const Edge *tmp = vertex.
+//		for (int i = 0; i < vertex.degree; i++)
+//		{
+//			if (tmp->_v == v)
+//				count++;
+//				tmp = tmp->_next;
+//		}
+//	}
+//	return count / 2;
+//}
+Vertex::Vertex()
 {
-	int degree = 0;
-	degree = G.adj(v).degree;
-	return degree;
+	log("Vertex():begin!\n");
+	_v = -1;
+	_degree = 0;
+	_adj = nullptr;
+	log("Vertex():end!\n");
 }
-int maxDegree(Graph &G)
+void Vertex::addEdge(int src, int dest, int weight)
 {
-	int max = 0;
-	for (int v = 0; v < G.V(); v++)
+	if (_v == -1)_v = src;//È¨ÒËÖ®¼Æ£¡
+	log("Vertex(%d):addEgde( src = %d, dest = %d, weight = %d ):begin£¡\n", _v, src, dest, weight);
+	if (src != _v)
 	{
-		if (degree(G, v) > max)max = degree(G, v);
+		log("Error:The source of Edge is not this Vertex£¡\n");
+		return;
+	}
+	Edge *old = _adj;
+	_adj = new Edge(_v, dest, weight, old);//´ÓÍ·¿ªÊ¼²åÈë±ß
+	_degree++;
+	log("Vertex(%d):addEgde( src = %d, dest = %d, weight = %d ):end£¡\n", _v, src, dest, weight);
+}
 
-	}
-	return max;
-}
-double avgDegree(Graph &G)
+bool Vertex::removeEdge(int dest)
 {
-	return 2 * G.E() / G.V();
-}
-int numberOfSelfloops(Graph &G)
-{
-	int count = 0;
-	for(int v = 0; v < G.V(); v++)
+	Edge *current = _adj;
+	Edge *pre = nullptr;
+	while (current != nullptr&&current->getDest() != dest)
 	{
-		const Vertex &vertex = G.adj(v);
-		const Edge *tmp = vertex.adj;
-		for (int i = 0; i < vertex.degree; i++)
-		{
-			if (tmp->_v == v)
-				count++;
-				tmp = tmp->_next;
-		}
+		pre = current;
+		current = current->_next;
 	}
-	return count / 2;
+	if (current != nullptr)
+	{
+		if (pre == nullptr)//ËµÃ÷ÒªÒÆ³ýÁÚ½Ó±íµÄµÚÒ»¸ö±ß,¼´_adjÖ¸ÏòµÄÄÇÌõ±ß
+		{
+			_adj = current->_next;
+			log("[Vertex(%d).removeEdge(%d)]:remove frist Edge in _adj success!\n", _v, dest);
+		}
+		else
+		{
+			pre->_next = current->_next;
+
+			log("[Vertex(%d).removeEdge(%d)]:remove Edge in _adj success!\n", _v, dest);
+		}
+		delete current;
+		current = nullptr;
+		--_degree;
+		return true;
+	}
+	else
+	{
+		log("[Vertex(%d).removeEdge(%d)]:No this edge in _adj!\n", _v, dest);
+		return false;
+	}
+}
+
+Vertex::~Vertex()
+{
+	log("[~Vertex(%d)]:begin!\n", _v);
+	while (_adj != nullptr)
+	{
+		removeEdge(_adj->_dest);//Ã¿´Î¶¼°ÑÁÚ½Ó±íÖÐµÄµÚÒ»Ìõ±ßÒÆ³ý£¬Ö±µ½_adjÎª¿Õ
+	}
+	log("[~Vertex(%d)]:end!\n", _v);
+}
+
+
+
+
+ostream &operator <<(ostream&out, const Vertex &V)
+{
+	out << "Vertex:" << V._v << " ,degree :" << V._degree << endl;
+	Edge *tmp = V._adj;
+	while (tmp!=nullptr)
+	{
+		out << *tmp;
+		tmp = tmp->getNext();
+	}
+	return out;
+}
+ostream &operator<<(ostream&out, const Edge &E)
+{
+	out<<"<"<<E._src<<" -- "<<E._dest<<" ,weight: "<<E._weight<<" >\n";
+	return out;
 }
 ostream &operator <<(ostream&out, Graph &G)
 {
 	out << G._v << " vertices, " << G._e << " edges\n";
 	for (int v = 0; v < G.V(); v++)
 	{
-		out << v << ":degree: ";
-		const Vertex &vertex = G.adj(v);
-		out << vertex.degree;
-		const Edge *tmp = vertex.adj;
-		for (int i = 0; i < vertex.degree; i++)
-		{
-			out << tmp->_v << " weight: " << tmp->_weight << "\n";
-			tmp = tmp->_next;
-		}
-		out << "\n";
+		out << G._vtables[v];
 	}
 	return out;
 }
 
 Graph::Graph(int v)//¹¹ÔìÒ»¸öµãÊýÄ¿Îªv£¬±ßÊýÄ¿Îª0µÄÍ¼¡£
 {
-	log("[:Graph(int v)]begin!\n");
+	log("[Graph(int %d)]begin!\n",v);
 	_v = v;
 	_e = 0;
 	_vtables = new Vertex[_v];//ÏÈ¸øÃ¿¸öµã·ÖÅä´æ´¢Æä¶ÈºÍÖ¸ÏòÁÚ½Ó±íµÄÖ¸ÕëµÄ¿Õ¼ä¡£Ä¬ÈÏdegree=0£¬adj = nullptr£»
-	log("[:Graph(int v)]end!\n");
+	log("[Graph(int %d)]end!\n",v);
 }
 Graph::Graph(istream &in)//´ÓÊäÈëÁ÷¶ÁÈ¡Í¼£¬ÊäÈë¸ñÊ½ÎªÁ½¸öÕûÊý£¨v£¬e£©£¬È»ºó+e×éÕûÊý£¬Ò»×éÕûÊýÎªÈý¸ö£¬·Ö±ðÊÇÔ´£¬Ä¿µÄ£¬È¨ÖØ
 {
-	log("[:Graph(istream &in)]begin!\n");
+	log("[Graph(istream &in)]begin!\n");
 	int E;
 	cin >> _v >>E;
 	log("input:_v:%d E:%d\n", _v, E);
@@ -76,34 +153,40 @@ Graph::Graph(istream &in)//´ÓÊäÈëÁ÷¶ÁÈ¡Í¼£¬ÊäÈë¸ñÊ½ÎªÁ½¸öÕûÊý£¨v£¬e£©£¬È»ºó+e×éÕ
 		log("input:src:%d  dest:%d  weight:%d\n ", v, w, weight);
 		addEdge(v, w,weight);
 	}
-	log("[:Graph(istream &in)]end!\n");
+	log("[Graph(istream &in)]end!\n");
 }
-void Graph::addEdge(int v, int w,int weight)//µ½µ×ÓÐÃ»ÓÐÉÚ±ø½Úµã£¿Ã»ÓÐ
+void Graph::addEdge(int v, int w,int weight)
 {
-	log("[addEdge]begin!\n");
+	log("[addEdge( v:%d  w:%d  weight:%d )]begin!\n",v,w,weight);
 	if (v >= _v || w >=_v)
 	{
 		log("[addEdge]input out of range\n");
 		return;
 	}
-	Edge *oldhead = _vtables[v].adj;//Ã¿´Î¶¼´ÓÍ·²åÈëÁ´µã£¬½«ÁÚ½Ó±íµÄÖ¸ÕëÖ¸Ïòµ±Ç°Òª²åÈëµÄ±ß£¬È»ºó½«µ±Ç°Òª²åÈëµÄ±ßÖ¸ÏòÔ­À´µÄÁ´±íÍ·
-	_vtables[v].adj = new Edge(w, weight, oldhead);//edge¹¹Ôìº¯Êý»á½«Ö´ÐÐ¡°µ±Ç°Òª²åÈëµÄ±ßÖ¸ÏòÔ­À´µÄÁ´±íÍ·¡±Õâ¸ö²Ù×÷
-	if (_vtables[v].adj == nullptr)
+	if(v == w)_vtables[v].addEdge(v, w, weight);
+	else
 	{
-		log("[addEdge]not have enough memory\n");
+		_vtables[v].addEdge(v, w, weight);
+		_vtables[w].addEdge(w, v, weight);
 	}
-	_vtables[v].degree++;
-	log("[addEdge]:add success:Edge:%d -- %d  weight: %d\n", v, w, weight);
-	oldhead = _vtables[w].adj;
-	_vtables[w].adj = new Edge(v, weight, oldhead);
-	if (_vtables[w].adj == nullptr)
-	{
-		log("[addEdge]not have enough memory\n");
-	}
-	_vtables[w].degree++;
-	log("[addEdge]:add success:Edge:%d -- %d  weight: %d\n", w, v, weight);
-	_e++;
-	log("[addEdge]end!\n");
+	//Edge *oldhead = _vtables[v].adj;//Ã¿´Î¶¼´ÓÍ·²åÈëÁ´µã£¬½«ÁÚ½Ó±íµÄÖ¸ÕëÖ¸Ïòµ±Ç°Òª²åÈëµÄ±ß£¬È»ºó½«µ±Ç°Òª²åÈëµÄ±ßÖ¸ÏòÔ­À´µÄÁ´±íÍ·
+	//_vtables[v].adj = new Edge(w, weight, oldhead);//edge¹¹Ôìº¯Êý»á½«Ö´ÐÐ¡°µ±Ç°Òª²åÈëµÄ±ßÖ¸ÏòÔ­À´µÄÁ´±íÍ·¡±Õâ¸ö²Ù×÷
+	//if (_vtables[v].adj == nullptr)
+	//{
+	//	log("[addEdge]not have enough memory\n");
+	//}
+	//_vtables[v].degree++;
+	//log("[addEdge]:add success:Edge:%d -- %d  weight: %d\n", v, w, weight);
+	//oldhead = _vtables[w].adj;
+	//_vtables[w].adj = new Edge(v, weight, oldhead);
+	//if (_vtables[w].adj == nullptr)
+	//{
+	//	log("[addEdge]not have enough memory\n");
+	//}
+	//_vtables[w].degree++;
+	//log("[addEdge]:add success:Edge:%d -- %d  weight: %d\n", w, v, weight);
+	//_e++;
+	log("[addEdge( v:%d  w:%d  weight:%d )]end!\n", v, w, weight);
 }
 const Vertex& Graph::adj(int v)const//·µ»Ø±íÊ¾¶¥µãvµÄ½á¹¹ÌåµÄÒýÓÃ£¬½á¹¹ÌåÖÐadjÖ¸ÕëÖ¸ÏòÁÚ½Ó±íµÄµÚÒ»Ìõ±ß£¬ÈôÖ¸Ïònull±íÊ¾Ã»ÓÐ±ß
 {
@@ -115,21 +198,21 @@ const Vertex& Graph::adj(int v)const//·µ»Ø±íÊ¾¶¥µãvµÄ½á¹¹ÌåµÄÒýÓÃ£¬½á¹¹ÌåÖÐadjÖ¸
 	}
 	return _vtables[v];
 }
-void Graph::removeVertex(int v)
+void Graph::removeVertex(int v)//ÏÈ²»¿¼ÂÇ
 {
-	if (v >= _v)
-	{
-		log("[removeVertex]input out of range\n");
-		return;
-	}
-	log("[removeVertex]removeVertex:%d\n", v);
-	_vtables[v].degree = 0;
-	 
-	while (_vtables[v].adj !=nullptr)
-	{
-		log("[removeVertex]adj:%d\n", _vtables[v].adj);
-		removeEdge(v, _vtables[v].adj->_v);//ÒÆ±ß²Ù×÷×ÔÈ»»á½«adjÖÐµÄ±ßÉ¾³ý£¬ËùÒÔ²»ÐèÒªadj = ajd-¡·next£»
-	}
+	//if (v >= _v)
+	//{
+	//	log("[removeVertex]input out of range\n");
+	//	return;
+	//}
+	//log("[removeVertex]removeVertex:%d\n", v);
+	//_vtables[v].degree = 0;
+	// 
+	//while (_vtables[v].adj !=nullptr)
+	//{
+	//	log("[removeVertex]adj:%d\n", _vtables[v].adj);
+	//	removeEdge(v, _vtables[v].adj->_v);//ÒÆ±ß²Ù×÷×ÔÈ»»á½«adjÖÐµÄ±ßÉ¾³ý£¬ËùÒÔ²»ÐèÒªadj = ajd-¡·next£»
+	//}
 }
 void Graph::removeEdge(int v, int w)
 {
@@ -138,9 +221,9 @@ void Graph::removeEdge(int v, int w)
 		log("[removeEdge]input out of range\n");
 		return;
 	}
-	log("[removeEdge]v:%d  w:%d  \n",v,w);
-	removeEdgeFromVtables(v, w);
-	removeEdgeFromVtables(w, v);
+	log("[removeEdge(v:%d  w:%d)]begin!\n",v,w);
+	_vtables[v].removeEdge(w);
+	_vtables[w].removeEdge(v);
 	//Edge *tmp = _vtables[v].adj;
 	//Edge *preTmp = _vtables[v].adj;
 	//while (tmp != nullptr&&tmp->_v!=w)
@@ -179,39 +262,6 @@ void Graph::removeEdge(int v, int w)
 	//	return;
 	//}
 
-}
-void Graph::removeEdgeFromVtables(int vtables, int dest)
-{
-	Edge *tmp = _vtables[vtables].adj;
-	Edge *preTmp = nullptr;
-	while (tmp != nullptr&&tmp->_v != dest)
-	{
-		preTmp = tmp;
-		tmp = tmp->_next;
-	}
-	if (tmp != nullptr)
-	{
-		if (preTmp == nullptr)
-		{
-			_vtables[vtables].adj = tmp->_next;
-			delete tmp;
-			tmp = nullptr;
-			log("[removeEdgeFromVtables]remove success: %d -- %d \n", vtables, dest);
-		}
-		else
-		{
-			preTmp->_next = tmp->_next;
-			delete tmp;
-			tmp = nullptr;
-			log("[removeEdgeFromVtables]remove success: %d -- %d \n", vtables, dest);
-		}
-
-	}
-	else
-	{
-		log("[removeEdgeFromVtables]The Edge:%d -- %d do not exit\n", vtables, dest);
-		return;
-	}
 }
 Graph::~Graph()
 {

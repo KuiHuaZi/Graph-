@@ -3,6 +3,7 @@
 #include<string>
 #include<iostream>
 #include <stdarg.h>
+
 using namespace std;
 class Vertex;
 class Edge

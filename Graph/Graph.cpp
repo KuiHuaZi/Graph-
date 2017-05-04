@@ -1,4 +1,5 @@
 #include "Graph.h"
+#include"search.h"
 //int degree(Graph& G, int v)
 //{
 //	int degree = 0;
@@ -295,6 +296,6 @@ int main()
 {
 	while (true)
 	{
-		GraphMain();
+		searchMain();
 	}
 }

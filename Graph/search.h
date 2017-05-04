@@ -1,11 +1,12 @@
 #pragma once
 #include"Graph.h"
+using namespace std;
 class DephthFristSearch
 {
 public:
-	DephthFristSearch(Graph G, int s);
+	DephthFristSearch(Graph &G, int s);
 	~DephthFristSearch();
-	void dfs(const Graph&, int s);
+	void dfs(const Graph &G, int s);
 	bool marked(int w) { return _marked[w]; }
 	int count() { return _count; }
 private:
@@ -20,7 +21,8 @@ public:
 	DepthFristPaths(Graph &G, int s);
 	~DepthFristPaths();
 	bool hasPathTo(int v)const;
-	const int*pathTo(int v)const; 
+	const vector<int>*pathTo(int v); 
+	int costOfpathTo(int v) { return _cost[v]; }
 private:
 	int *_cost;//s到相应节点的权重
 	bool *_marked;
@@ -29,5 +31,6 @@ private:
 	int _s;//起点
 	DepthFristPaths(const DepthFristPaths&);
 	const DepthFristPaths& operator=(const DepthFristPaths&);
-	void dfs(const Graph&, int v);
+	void dfs(const Graph&G, int v);
 };
+int searchMain();

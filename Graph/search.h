@@ -1,5 +1,6 @@
 #pragma once
 #include"Graph.h"
+#include<queue>
 using namespace std;
 class DephthFristSearch
 {
@@ -34,3 +35,19 @@ private:
 	void dfs(const Graph&G, int v);
 };
 int searchMain();
+class BFSwithNoWeight
+{
+public:
+	BFSwithNoWeight(Graph &G, int s);
+	~BFSwithNoWeight();
+	void bfs(Graph&G, int s);
+	bool hasPathTo(int v);
+	const vector<int> *pathTo(int v);
+	int costTo(int v);
+private:
+	int *_cost;
+	int *_edgeTo;
+	bool *_marked;
+	int _s;
+};
+int BFSwithNoWeightMain();

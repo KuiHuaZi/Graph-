@@ -296,6 +296,6 @@ int main()
 {
 	while (true)
 	{
-		searchMain();
+		BFSwithNoWeightMain();
 	}
 }

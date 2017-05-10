@@ -153,6 +153,7 @@ Graph::Graph(istream &in)//´ÓÊäÈëÁ÷¶ÁÈ¡Í¼£¬ÊäÈë¸ñÊ½ÎªÁ½¸öÕûÊı£¨v£¬e£©£¬È»ºó+e×éÕ
 		cin >> v >> w>>weight;
 		log("input:src:%d  dest:%d  weight:%d\n ", v, w, weight);
 		_vtables[v]._v = v;
+		_vtables[w]._v = w;
 		addEdge(v, w,weight);
 	}
 	cin >> _numMustNode;
@@ -162,19 +163,20 @@ Graph::Graph(istream &in)//´ÓÊäÈëÁ÷¶ÁÈ¡Í¼£¬ÊäÈë¸ñÊ½ÎªÁ½¸öÕûÊı£¨v£¬e£©£¬È»ºó+e×éÕ
 	{
 		int v;
 		cin >> v;
-		log("  %d", v);
+		log("  %d\n", v);
 		_mustNode[i] = v;
 	}
+
 	cin >> _numMustEdge;
 	log("input:_numMustEdge: %d :", _numMustEdge);
 	for (int i = 0; i < _numMustEdge; i++)
 	{
 		int u, v,weight;
 		cin >> u >> v>>weight;
-		log("mustEdge:%d--%d  ", u, v);
+		log("mustEdge:%d--%d weight:%d \n", u, v,weight);
 		//_weightHaveToAdd += weight;
 		removeEdge(u, v);//ÔÚ±ØĞë¾­¹ıµÄ±ßµÄÖĞ¼äÌí¼ÓÒ»¸ö½Úµã£ºÉ¾³ı±Ø¾­µÄ±ß£¬È»ºóÌí¼ÓÒ»¸ö½Úµã£¬ÓÃÕâ¸ö½Úµã½«Ô­±Ø¾­µÄ±ßµÄÁ½¸ö¶ËµãÁ¬ÉÏ
-		_vtables.push_back(Vertex(_v + i));
+		_vtables.insert(_vtables.end(), Vertex(_v + 1));
 		addEdge(_v + i, u, weight);
 		addEdge(_v + i, v, 0);
 		//½«ĞÂ¼ÓµÄµãºÍ±Ø¾­±ßµÄÁ½¸ö¶Ëµã¶¼Ìí¼Ó½ø_mustNodeÖĞ¡£

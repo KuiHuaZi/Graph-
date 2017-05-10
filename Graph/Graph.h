@@ -57,15 +57,15 @@ class Vertex
 	friend ostream &operator <<(ostream&out, const Vertex &V);
 public:
 	int _v;
-	Vertex();
+	Vertex(int v = -1);
 	void addEdge(int src, int dest, int weight);
 	bool removeEdge(int dest);
 	~Vertex();
 	int _degree;
 	Edge * _adj;
 private:
-	Vertex(const Vertex&);
-	Vertex &operator = (const Vertex&);
+	//Vertex(const Vertex&);
+	//Vertex &operator = (const Vertex&);
 
 	
 };
@@ -83,10 +83,18 @@ public:
 	void removeVertex(int v);
 	void removeEdge(int v, int w);
 	int numberOfSelfloops();
+	int _source;
+	int _end;
+	int _numMustNode;
+	int _numMustEdge;
+	int _noEdgeNum;
+	int _Maxnumpoints;
+	vector<int> _mustNode;
+	int _weightHaveToAdd;
 private:
 	int _v;
 	int _e;
-	Vertex *_vtables;
+	vector<Vertex> _vtables;
 	Graph(const Graph&);
 	const Graph &operator =(const Graph &);
 	

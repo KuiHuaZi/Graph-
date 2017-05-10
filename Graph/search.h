@@ -35,19 +35,25 @@ private:
 	void dfs(const Graph&G, int v);
 };
 int searchMain();
-class BFSwithNoWeight
+class BFS
 {
 public:
-	BFSwithNoWeight(Graph &G, int s);
-	~BFSwithNoWeight();
+	BFS(Graph &G, int s);
+	~BFS();
 	void bfs(Graph&G, int s);
 	bool hasPathTo(int v);
 	const vector<int> *pathTo(int v);
 	int costTo(int v);
+	int weightTo(int v)
+	{
+		return _costOfweight[v];
+	}
+	int _s;
 private:
 	int *_cost;
 	int *_edgeTo;
 	bool *_marked;
-	int _s;
+	int *_costOfweight;
+	
 };
-int BFSwithNoWeightMain();
+int BFSMain();

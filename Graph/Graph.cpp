@@ -36,17 +36,17 @@
 //	}
 //	return count / 2;
 //}
-Vertex::Vertex()
+Vertex::Vertex(int v)
 {
 	log("Vertex():begin!\n");
-	_v = -1;
+	_v = v;
 	_degree = 0;
 	_adj = nullptr;
 	log("Vertex():end!\n");
 }
 void Vertex::addEdge(int src, int dest, int weight)
 {
-	if (_v == -1)_v = src;//È¨ÒËÖ®¼Æ£¡
+	//if (_v == -1)_v = src;//È¨ÒËÖ®¼Æ£¡
 	log("Vertex(%d):addEgde( src = %d, dest = %d, weight = %d ):begin£¡\n", _v, src, dest, weight);
 	if (src != _v)
 	{
@@ -137,7 +137,7 @@ Graph::Graph(int v)//¹¹ÔìÒ»¸öµãÊıÄ¿Îªv£¬±ßÊıÄ¿Îª0µÄÍ¼¡£
 	log("[Graph(int %d)]begin!\n",v);
 	_v = v;
 	_e = 0;
-	_vtables = new Vertex[_v];//ÏÈ¸øÃ¿¸öµã·ÖÅä´æ´¢Æä¶ÈºÍÖ¸ÏòÁÚ½Ó±íµÄÖ¸ÕëµÄ¿Õ¼ä¡£Ä¬ÈÏdegree=0£¬adj = nullptr£»
+	_vtables.resize(_v);//ÏÈ¸øÃ¿¸öµã·ÖÅä´æ´¢Æä¶ÈºÍÖ¸ÏòÁÚ½Ó±íµÄÖ¸ÕëµÄ¿Õ¼ä¡£Ä¬ÈÏdegree=0£¬adj = nullptr£»
 	log("[Graph(int %d)]end!\n",v);
 }
 Graph::Graph(istream &in)//´ÓÊäÈëÁ÷¶ÁÈ¡Í¼£¬ÊäÈë¸ñÊ½ÎªÁ½¸öÕûÊı£¨v£¬e£©£¬È»ºó+e×éÕûÊı£¬Ò»×éÕûÊıÎªÈı¸ö£¬·Ö±ğÊÇÔ´£¬Ä¿µÄ£¬È¨ÖØ
@@ -146,14 +146,60 @@ Graph::Graph(istream &in)//´ÓÊäÈëÁ÷¶ÁÈ¡Í¼£¬ÊäÈë¸ñÊ½ÎªÁ½¸öÕûÊı£¨v£¬e£©£¬È»ºó+e×éÕ
 	int E;
 	cin >> _v >>E;
 	log("input:_v:%d E:%d\n", _v, E);
-	_vtables = new Vertex[_v];
+	_vtables.resize(_v);
 	for (int i = 1; i <= E; i++)
 	{
 		int v, w,weight;
 		cin >> v >> w>>weight;
 		log("input:src:%d  dest:%d  weight:%d\n ", v, w, weight);
+		_vtables[v]._v = v;
 		addEdge(v, w,weight);
 	}
+	cin >> _numMustNode;
+	log("input:_numMustNode: %d : ", _numMustNode);
+	_mustNode.resize(_numMustNode);
+	for (int i = 0; i <_numMustNode; i++)
+	{
+		int v;
+		cin >> v;
+		log("  %d", v);
+		_mustNode[i] = v;
+	}
+	cin >> _numMustEdge;
+	log("input:_numMustEdge: %d :", _numMustEdge);
+	for (int i = 0; i < _numMustEdge; i++)
+	{
+		int u, v,weight;
+		cin >> u >> v>>weight;
+		log("mustEdge:%d--%d  ", u, v);
+		//_weightHaveToAdd += weight;
+		removeEdge(u, v);//ÔÚ±ØĞë¾­¹ıµÄ±ßµÄÖĞ¼äÌí¼ÓÒ»¸ö½Úµã£ºÉ¾³ı±Ø¾­µÄ±ß£¬È»ºóÌí¼ÓÒ»¸ö½Úµã£¬ÓÃÕâ¸ö½Úµã½«Ô­±Ø¾­µÄ±ßµÄÁ½¸ö¶ËµãÁ¬ÉÏ
+		_vtables.push_back(Vertex(_v + i));
+		addEdge(_v + i, u, weight);
+		addEdge(_v + i, v, 0);
+		//½«ĞÂ¼ÓµÄµãºÍ±Ø¾­±ßµÄÁ½¸ö¶Ëµã¶¼Ìí¼Ó½ø_mustNodeÖĞ¡£
+		_mustNode.push_back(_v + i);
+		vector<int>::iterator it;
+		it = find(_mustNode.begin(), _mustNode.end(), u);//
+		if (it != _mustNode.end())_mustNode.push_back(u);
+		it = find(_mustNode.begin(), _mustNode.end(), v);
+		if (it != _mustNode.end())_mustNode.push_back(v);
+	}
+	log("\n");
+	cin >> _noEdgeNum;
+	log("input:_noEdgeNum:%d", _noEdgeNum);
+	for (int i = 0; i < _noEdgeNum; i++)
+	{
+		int u, v;
+		cin >> u >> v;
+		log("noEdge:%d--%d  ", u, v);
+		removeEdge(u, v);
+	}
+	log("\n");
+	cin >> _source >> _end;
+	log("input:_source:%d  ,_end:%d  \n", _source, _end);
+	cin >> _Maxnumpoints;
+	log("input:_Maxnumpoints:%d\n", _Maxnumpoints);
 	log("[Graph(istream &in)]end!\n");
 }
 void Graph::addEdge(int v, int w,int weight)
@@ -272,7 +318,6 @@ Graph::~Graph()
 		
 		removeVertex(i);
 	}
-	delete[] _vtables;
 
 	log("[~Graph]end\n");
 }
@@ -294,8 +339,97 @@ void GraphMain()
 }
 int main()
 {
-	while (true)
+	Graph g(cin);//¸ù¾İÊäÈëÀ´¹¹ÔìÍ¼£¬Í¬Ê±¼ÇÂ¼ÏÂÆä±ØĞëÒª¾­¹ıµÄµã£¬¼ÇÂ¼ÏÂÆğÖ¹½Úµã£¬É¾³ı²»ÄÜ¾­¹ıµÄ±ß£¬ÔÚ±ØĞë¾­¹ıµÄ±ßµÄÖĞ¼äÌí¼ÓÒ»¸ö½Úµã£¬Í¬Ê±½«±Ø¾­±ßµÄ¶ËµãºÍ
+	//Õâ¸öÌí¼ÓµÄµã¶¼¼Ó½ø±Ø¾­µÄµã¡£
+
+	//ÆäºÍÁ½±ß¶¥µãµÄÈ¨ÖØÎª0£¨ÔÚ×îºóµÃ³ö½á¹ûµÄÊ±ºò½«È¨ÖØ¼ÓÉÏ,Í¬Ê±½ÚµãµÄÏŞÖÆÒª·Å¿í£¬Ò»¸ö±ß·Å¿íÒ»¸ö£©
+	//¶ÔËùÓĞ±ØĞë¾­¹ıµÄ½Úµã£¨°üÀ¨ÆğÖ¹½Úµã£©£¬Çó³öÆäÓëËùÓĞµãÖ®¼äµÄ×î¶ÌÂ·£¨°üÀ¨µãÊı×îÉÙµÄÂ·ºÍÈ¨ÖØ×îÉÙµÄÂ·£©£¨Ê¹ÓÃ¹ã¶ÈÓÅÏÈ±éÀú£¬Í¬Ê±¼ÇÂ¼ÆäÏûºÄ£©
+	vector<BFS> leastNumPointsCostPath;
+	for (int i = 0; i < g._mustNode.size(); i++)
 	{
-		BFSwithNoWeightMain();
+		leastNumPointsCostPath.push_back(BFS(g, g._mustNode[i]));//½«±Ø¾­½Úµãµ½ËùÓĞ½ÚµãµÄµãÊı×î¶ÌÂ·Ëã³öÀ´
 	}
+	BFS sourceTo(g, g._source);// endTo(g, g._end);//½«ÆğÖ¹½Úµãµ½ËùÓĞ½ÚµãµÄµãÊı×î¶ÌÂ·Ëã³öÀ´
+	vector< vector<int> > paths;//ÓÃÀ´´æ´¢²»Í¬ÅÅÁĞµÄÂ·¾¶
+	vector<int> pathsCostPoints;//ÓÃÀ´´æ´¢¶ÔÓ¦Â·¾¶µÄcost
+	vector<int> pathsCostWeight;//ÓÃÀ´´æ´¢¶ÔÓ¦Â·¾¶µÄÈ¨ÖØ
+	int maxPointNum = g._Maxnumpoints; //+ g._numMustEdge;²»ĞèÒªÊÇÒòÎªÔÚËãµã¿ªÏúµÄÊ±ºò£¬²»»á¼ÆËãÕâ¸öµã£¬ËùÒÔ²»ĞèÒª·Å¿íÏŞÖÆ//ÒòÎªÔÚÃ¿Ò»Ìõ±Ø¾­µÄ±ß¶¼Ìí¼ÓÁËÒ»¸ö²»´æÔÚµÄµã£¬ËùÒÔ½ÚµãÏŞÖÆÒª·Å¿í
+	sort(g._mustNode.begin(), g._mustNode.end());
+	int pathId = 0, bestCost = 100000;
+	do 
+	{
+		int costPoints = 0, costWeight = 0;
+		
+		costPoints += sourceTo.costTo(g._mustNode[0]);
+		costWeight += sourceTo.weightTo(g._mustNode[0]);
+		vector<int>path(*sourceTo.pathTo(g._mustNode[0]));
+		for (int i = 0; i < g._mustNode.size()-1; i++)
+		{
+			for (int j = 0; j < leastNumPointsCostPath.size(); j++)//ÕÒµ½µã_mustNode[i]µÄbfsµÄ½á¹û£¬È»ºó°Ñ_mustNode[i]µ½_mustNode[i+1]µÄÂ·¾¶Ìí¼Ó½øÈ¥
+			{
+				if (leastNumPointsCostPath[j]._s == g._mustNode[i])
+				{
+					costPoints += leastNumPointsCostPath[j].costTo(g._mustNode[i+1] );
+					costWeight += leastNumPointsCostPath[j].weightTo(g._mustNode[i+1] );
+					path.insert(path.end(), (*leastNumPointsCostPath[j].pathTo(g._mustNode[i+1])).begin()+1, (*leastNumPointsCostPath[j].pathTo(g._mustNode[i + 1])).end());//½«µãiµ½i+1µÄÂ·¾¶Ìí¼Ó½øpathÀï£¬È¥³ıµÚÒ»¸ö½Úµã£¬ÒòÎª»áºÍÖ®Ç°Â·¾¶½áÊøµãÖØºÏ
+					break;
+				}
+			}
+			if (costPoints > maxPointNum)//´ËÊ±½ÚµãÊıÄ¿³¬¹ıÏŞÖÆ¡£
+			{
+				costPoints = -1;
+				costWeight = -1;
+				//path = { -1 };
+				break;
+			}
+			
+		}
+		//Ìí¼Ó×îºóÒ»¸ö_mustNodeµ½end¶¥µãµÄÂ·¾¶ºÍ»¨Ïú
+		if (costPoints != -1)//ËµÃ÷´ËÂ·ÎŞÒâÒå£¬Ö±½Ó¼ÆËãÏÂÒ»¸öÅÅÁĞ
+		{
+
+			continue;
+		}
+		//else if((costPoints+=leastNumPointsCostPath[leastNumPointsCostPath.size()-1].costTo(g._end))>maxPointNum)//Èç¹û¼ÓÉÏÅÅÁĞÀï×îºóÒ»¸öµãµ½ÖÕµãµÄ¿ªÏú³¬¹ıÁËÏŞÖÆ
+		//{
+		//	continue;
+		//}
+		else
+		{
+			for (int j = 0; j < leastNumPointsCostPath.size(); j++)//ÕÒµ½µã_mustNode[i]µÄbfsµÄ½á¹û£¬È»ºó°Ñ_mustNode[i]µ½_mustNode[i+1]µÄÂ·¾¶Ìí¼Ó½øÈ¥
+			{
+				if (leastNumPointsCostPath[j]._s == g._mustNode[g._mustNode.size()-1])//ÕÒ×îºóÒ»¸ö½Úµã
+				{
+					costPoints += leastNumPointsCostPath[j].costTo(g._end);
+					if (costPoints > maxPointNum)
+					{
+						break;//´óÓÚ½ÚµãÏŞÖÆ£¬Ö±½ÓÌø³öÈ¥£¬²»°ÑÂ·¾¶Ìí¼Ó¡£
+					}
+					pathsCostPoints.push_back(costPoints);
+					costWeight += leastNumPointsCostPath[j].weightTo(g._end);
+					pathsCostWeight.push_back(costWeight);
+					path.insert(path.end(), (*leastNumPointsCostPath[j].pathTo(g._end)).begin() + 1, (*leastNumPointsCostPath[j].pathTo(g._end)).end());//½«_mustNodeÀïµÄ×îºóÒ»¸ö½Úµãµ½_end½ÚµãµÄÂ·¾¶Ìí¼Ó½øÈ¥
+					paths.push_back(path);
+					break;
+				}
+			}
+
+		}
+		
+		
+
+
+	} while (next_permutation(g._mustNode.begin(),g._mustNode.end()));
+	//¶ÔËùÓĞ±Ø½ø½Úµã½øĞĞÈ«ÅÅÁĞ£¬°´ÕÕË³Ğò£¬ÕÒ³öÆäÖĞÂú×ã½ÚµãÊıÄ¿Ğ¡ÓÚÒªÇóµÄÂ·
+	for (int i = 0; i < paths.size(); i++)
+	{
+		log("paths:\n costPoints:%d \n costWeight:%d \n", pathsCostPoints[i], pathsCostWeight[i]);
+		for (int j = 0; j < paths[i].size(); j++)
+		{
+			cout << paths[i][j] << "---";
+		}
+		cout << endl;
+	}
+
+	//Çó³öÆäÈ¨ÖØ¡£¶ÔÓÚÃ¿¸ö½â¶¼ÓÃ±ß/Â·Ìæ»»È¥Çó³öÂú×ãÌõ¼şµÄ×îÓÅ½â£¬È»ºó·µ»Ø³ö×îÓÅ½â¡£
 }

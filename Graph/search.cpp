@@ -89,29 +89,32 @@ void DepthFristPaths::dfs(const Graph &G, int v)
 	}
 
 }
-BFSwithNoWeight::BFSwithNoWeight(Graph &G, int s)
+BFS::BFS(Graph &G, int s)
 {
 	_marked = new bool[G.V()]();
 	_cost = new int[G.V()]();
+	_costOfweight = new int[G.V()]();
 	_edgeTo = new int[G.V()]();
 	_s = s;
 	for (int i = 0; i < G.V(); i++)
 	{
 		_edgeTo[i] = -1;
 		_cost[i] = -1;
+		_costOfweight[i] = -1;
 	}
 	_edgeTo[s] = s;
 	_cost[s] = 0;
+	_costOfweight[s] = 0;
 	bfs(G, s);
 
 }
-BFSwithNoWeight::~BFSwithNoWeight()
+BFS::~BFS()
 {
 	delete[]_marked;
 	delete[]_cost;
 	delete[]_edgeTo;
 }
-void BFSwithNoWeight::bfs(Graph&G, int s)
+void BFS::bfs(Graph&G, int s)
 {
 	queue<int> Vqueue;
 	_marked[s] = true;
@@ -129,7 +132,9 @@ void BFSwithNoWeight::bfs(Graph&G, int s)
 			{
 				_marked[w] = true;
 				_edgeTo[w] = v;
-				_cost[w] = _cost[v] + 1;
+				if (w >= G.V())_cost[w] = _cost[v];//如果节点是我添加进去的点，那么在算节点开销的时候，就不计算他。
+				else _cost[w] = _cost[v] + 1;
+				_costOfweight[w] = _cost[v] + tmp->_weight;
 				Vqueue.push(w);
 			}
 			tmp = tmp->_next;
@@ -137,11 +142,11 @@ void BFSwithNoWeight::bfs(Graph&G, int s)
 
 	}
 }
-bool BFSwithNoWeight::hasPathTo(int v)
+bool BFS::hasPathTo(int v)
 {
 	return _marked[v];
 }
-const vector<int> *BFSwithNoWeight::pathTo(int v)
+const vector<int> *BFS::pathTo(int v)
 {
 	vector<int> *path = new vector<int>;
 	for (int x = v; x != _s; x = _edgeTo[x])
@@ -151,7 +156,7 @@ const vector<int> *BFSwithNoWeight::pathTo(int v)
 	path->insert(path->begin(), _s);
 	return path;
 }
-int BFSwithNoWeight::costTo(int v)
+int BFS::costTo(int v)
 {
 	return _cost[v];
 }
@@ -181,12 +186,12 @@ int searchMain()
 	}
 	return 1;
 }
-int BFSwithNoWeightMain()
+int BFSMain()
 {
 	Graph g(cin);
 	int s;
 	cin >> s;
-	BFSwithNoWeight path(g, s);
+	BFS path(g, s);
 	for (int v = 0; v < g.V(); v++)
 	{
 		if (path.hasPathTo(v))

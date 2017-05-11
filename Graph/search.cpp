@@ -96,6 +96,7 @@ BFS::BFS(Graph &G, int s)
 	_costOfweight = new int[G.V()]();
 	_edgeTo = new int[G.V()]();
 	_s = s;
+	_numOfv = G.V();
 	for (int i = 0; i < G.V(); i++)
 	{
 		_edgeTo[i] = -1;
@@ -116,6 +117,7 @@ BFS::~BFS()
 }
 void BFS::bfs(Graph&G, int s)
 {
+	log("BFS(G,s):begin\n");
 	queue<int> Vqueue;
 	_marked[s] = true;
 	Vqueue.push(s);
@@ -141,17 +143,19 @@ void BFS::bfs(Graph&G, int s)
 		}
 
 	}
+	log("BFS(G,s):end\n");
 }
 bool BFS::hasPathTo(int v)
 {
 	return _marked[v];
 }
-const vector<int> *BFS::pathTo(int v)
+vector<int> *BFS::pathTo(int v)
 {
-	vector<int> *path = new vector<int>;
-	for (int x = v; x != _s; x = _edgeTo[x])
+	vector<int> *path = new vector<int>(18);
+	int i = 0;
+	for (int x = v; x != _s; x = _edgeTo[x],i++)
 	{
-		path->insert(path->begin(), x);
+		(*path)[i] = x;
 	}
 	path->insert(path->begin(), _s);
 	return path;

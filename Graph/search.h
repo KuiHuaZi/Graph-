@@ -39,17 +39,40 @@ class BFS
 {
 public:
 	BFS(Graph &G, int s);
+	BFS()
+	{
+		log("BFS:mo ren gouzhao\n");
+	}
 	~BFS();
 	void bfs(Graph&G, int s);
 	bool hasPathTo(int v);
-	const vector<int> *pathTo(int v);
+	vector<int> *pathTo(int v);
 	int costTo(int v);
 	int weightTo(int v)
 	{
 		return _costOfweight[v];
 	}
 	int _s;
+	BFS& operator =(const BFS& b)
+	{
+		_numOfv = b._numOfv;
+		_s = b._s;
+		_cost = new int[_numOfv];
+		_edgeTo = new int[_numOfv];
+		_costOfweight = new int[_numOfv];
+		_marked = new bool[_numOfv];
+		for (int i = 0; i < _numOfv; i++)
+		{
+			_cost[i] = b._cost[i];
+			_edgeTo[i] = b._edgeTo[i];
+			_costOfweight[i] = b._costOfweight[i];
+			_marked[i] = b._marked[i];
+		}
+		log("BFS =:end!\n");
+		return *this;
+	}
 private:
+	int _numOfv;
 	int *_cost;
 	int *_edgeTo;
 	bool *_marked;

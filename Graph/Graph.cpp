@@ -146,7 +146,7 @@ Graph::Graph(istream &in)//´ÓÊäÈëÁ÷¶ÁÈ¡Í¼£¬ÊäÈë¸ñÊ½ÎªÁ½¸öÕûÊı£¨v£¬e£©£¬È»ºó+e×éÕ
 	int E;
 	cin >> _v >>E;
 	log("input:_v:%d E:%d\n", _v, E);
-	_vtables.resize(_v);
+	_vtables.resize(_v+2);
 	for (int i = 1; i <= E; i++)
 	{
 		int v, w,weight;
@@ -176,25 +176,26 @@ Graph::Graph(istream &in)//´ÓÊäÈëÁ÷¶ÁÈ¡Í¼£¬ÊäÈë¸ñÊ½ÎªÁ½¸öÕûÊı£¨v£¬e£©£¬È»ºó+e×éÕ
 		log("mustEdge:%d--%d weight:%d \n", u, v,weight);
 		//_weightHaveToAdd += weight;
 		removeEdge(u, v);//ÔÚ±ØĞë¾­¹ıµÄ±ßµÄÖĞ¼äÌí¼ÓÒ»¸ö½Úµã£ºÉ¾³ı±Ø¾­µÄ±ß£¬È»ºóÌí¼ÓÒ»¸ö½Úµã£¬ÓÃÕâ¸ö½Úµã½«Ô­±Ø¾­µÄ±ßµÄÁ½¸ö¶ËµãÁ¬ÉÏ
-		_vtables.insert(_vtables.end(), Vertex(_v + 1));
+		_vtables[_v+i]._v = _v+i;
 		addEdge(_v + i, u, weight);
 		addEdge(_v + i, v, 0);
 		//½«ĞÂ¼ÓµÄµãºÍ±Ø¾­±ßµÄÁ½¸ö¶Ëµã¶¼Ìí¼Ó½ø_mustNodeÖĞ¡£
 		_mustNode.push_back(_v + i);
 		vector<int>::iterator it;
 		it = find(_mustNode.begin(), _mustNode.end(), u);//
-		if (it != _mustNode.end())_mustNode.push_back(u);
+		if (it == _mustNode.end())_mustNode.push_back(u);
 		it = find(_mustNode.begin(), _mustNode.end(), v);
-		if (it != _mustNode.end())_mustNode.push_back(v);
+		if (it == _mustNode.end())_mustNode.push_back(v);
 	}
+	_v += 2;//È¨ÒËÖ®¼Æ£¬×îºÃÔÚforÀïÃæ¼Ó¡£
 	log("\n");
 	cin >> _noEdgeNum;
 	log("input:_noEdgeNum:%d", _noEdgeNum);
 	for (int i = 0; i < _noEdgeNum; i++)
 	{
-		int u, v;
-		cin >> u >> v;
-		log("noEdge:%d--%d  ", u, v);
+		int u, v,weight;
+		cin >> u >> v>>weight;
+		log("noEdge:%d--%d  weight:%d", u, v,weight);
 		removeEdge(u, v);
 	}
 	log("\n");
@@ -207,11 +208,11 @@ Graph::Graph(istream &in)//´ÓÊäÈëÁ÷¶ÁÈ¡Í¼£¬ÊäÈë¸ñÊ½ÎªÁ½¸öÕûÊı£¨v£¬e£©£¬È»ºó+e×éÕ
 void Graph::addEdge(int v, int w,int weight)
 {
 	log("[addEdge( v:%d  w:%d  weight:%d )]begin!\n",v,w,weight);
-	if (v >= _v || w >=_v)
-	{
-		log("[addEdge]input out of range\n");
-		return;
-	}
+	//if (v >= _v || w >=_v)
+	//{
+	//	log("[addEdge]input out of range\n");
+	//	return;
+	//}
 	if(v == w)_vtables[v].addEdge(v, w, weight);
 	else
 	{
@@ -239,12 +240,12 @@ void Graph::addEdge(int v, int w,int weight)
 }
 const Vertex& Graph::adj(int v)const//·µ»Ø±íÊ¾¶¥µãvµÄ½á¹¹ÌåµÄÒıÓÃ£¬½á¹¹ÌåÖĞadjÖ¸ÕëÖ¸ÏòÁÚ½Ó±íµÄµÚÒ»Ìõ±ß£¬ÈôÖ¸Ïònull±íÊ¾Ã»ÓĞ±ß
 {
-	if (v >= _v)
-	{
-		log("[adj]input out of range\n");
-		static Vertex t;
-		return t;
-	}
+	//if (v >= _v)
+	//{
+	//	log("[adj]input out of range\n");
+	//	static Vertex t;
+	//	return t;
+	//}
 	return _vtables[v];
 }
 void Graph::removeVertex(int v)//ÏÈ²»¿¼ÂÇ
@@ -347,9 +348,11 @@ int main()
 	//ÆäºÍÁ½±ß¶¥µãµÄÈ¨ÖØÎª0£¨ÔÚ×îºóµÃ³ö½á¹ûµÄÊ±ºò½«È¨ÖØ¼ÓÉÏ,Í¬Ê±½ÚµãµÄÏŞÖÆÒª·Å¿í£¬Ò»¸ö±ß·Å¿íÒ»¸ö£©
 	//¶ÔËùÓĞ±ØĞë¾­¹ıµÄ½Úµã£¨°üÀ¨ÆğÖ¹½Úµã£©£¬Çó³öÆäÓëËùÓĞµãÖ®¼äµÄ×î¶ÌÂ·£¨°üÀ¨µãÊı×îÉÙµÄÂ·ºÍÈ¨ÖØ×îÉÙµÄÂ·£©£¨Ê¹ÓÃ¹ã¶ÈÓÅÏÈ±éÀú£¬Í¬Ê±¼ÇÂ¼ÆäÏûºÄ£©
 	vector<BFS> leastNumPointsCostPath;
+	leastNumPointsCostPath.resize(g._mustNode.size());
 	for (int i = 0; i < g._mustNode.size(); i++)
 	{
-		leastNumPointsCostPath.push_back(BFS(g, g._mustNode[i]));//½«±Ø¾­½Úµãµ½ËùÓĞ½ÚµãµÄµãÊı×î¶ÌÂ·Ëã³öÀ´
+		BFS tmp(g, g._mustNode[i]);
+		leastNumPointsCostPath[i]=tmp;//½«±Ø¾­½Úµãµ½ËùÓĞ½ÚµãµÄµãÊı×î¶ÌÂ·Ëã³öÀ´
 	}
 	BFS sourceTo(g, g._source);// endTo(g, g._end);//½«ÆğÖ¹½Úµãµ½ËùÓĞ½ÚµãµÄµãÊı×î¶ÌÂ·Ëã³öÀ´
 	vector< vector<int> > paths;//ÓÃÀ´´æ´¢²»Í¬ÅÅÁĞµÄÂ·¾¶
